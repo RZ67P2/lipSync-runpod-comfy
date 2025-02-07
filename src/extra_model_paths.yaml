@@ -10,3 +10,5 @@ runpod_worker_comfy:
   upscale_models: ComfyUI/models/upscale_models/
   vae: ComfyUI/models/vae/
   unet: ComfyUI/models/unet/
+  input: ComfyUI/input
+  
