@@ -6,7 +6,7 @@
             "disabled": false
         },
         "https://github.com/ShmuelRonen/ComfyUI-LatentSyncWrapper.git": {
-            "hash": "373d9a257b6a6d6db80dca0084b94ea03184151b",
+            "hash": "8f2a008dcb9996b74c5110c009be063e7565c14f",
             "disabled": false
         }
     },
@@ -41,6 +41,7 @@
         "diffusers==0.32.2": "",
         "einops==0.8.0": "",
         "face-alignment==1.4.1": "",
+        "ffmpeg==1.4": "",
         "ffmpeg-python==0.2.0": "",
         "filelock==3.17.0": "",
         "flatbuffers==25.1.24": "",

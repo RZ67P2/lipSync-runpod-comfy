@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
     git \
     wget \
     libgl1 \
+    ffmpeg \
     && ln -sf /usr/bin/python3.10 /usr/bin/python \
     && ln -sf /usr/bin/pip3 /usr/bin/pip
 
@@ -36,6 +37,12 @@ WORKDIR /comfyui
 
 # Install runpod
 RUN pip install runpod requests
+
+# Install AV
+RUN pip install av
+
+#install imageio-ffmpeg
+RUN pip install imageio-ffmpeg
 
 # Support for the network volume
 ADD src/extra_model_paths.yaml ./
