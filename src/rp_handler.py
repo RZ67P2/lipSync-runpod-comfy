@@ -213,32 +213,54 @@ def process_output_files(outputs, job_id):
         dict: A dictionary with the status ('success' or 'error') and the message,
               which is the URL to the file in AWS S3.
     """
-    # The path where ComfyUI stores the generated files
     COMFY_OUTPUT_PATH = os.environ.get("COMFY_OUTPUT_PATH", "/comfyui/output")
     print(f"runpod-worker-comfy - Using output path: {COMFY_OUTPUT_PATH}")
     print(f"runpod-worker-comfy - Processing outputs for job_id: {job_id}")
     print(f"runpod-worker-comfy - Raw outputs received: {outputs}")
 
-    output_images = {}
+    output_file = None
+    full_path = None
 
     print(f"runpod-worker-comfy - Processing node outputs...")
     for node_id, node_output in outputs.items():
         print(f"runpod-worker-comfy - Processing node {node_id}: {node_output}")
+        # Handle images
         if "images" in node_output:
             print(f"runpod-worker-comfy - Found images in node {node_id}")
             for image in node_output["images"]:
                 print(f"runpod-worker-comfy - Image details: {image}")
-                output_images = os.path.join(image["subfolder"], image["filename"])
-                print(f"runpod-worker-comfy - Constructed path: {output_images}")
+                output_file = os.path.join(image["subfolder"], image["filename"])
+                full_path = image.get("fullpath")
+        # Handle videos/gifs
+        if "gifs" in node_output:
+            print(f"runpod-worker-comfy - Found video in node {node_id}")
+            for video in node_output["gifs"]:
+                print(f"runpod-worker-comfy - Video details: {video}")
+                output_file = os.path.join(video["subfolder"], video["filename"])
+                full_path = video.get("fullpath")
 
     print(f"runpod-worker-comfy - File generation is done")
 
-    # expected file output folder
-    local_image_path = f"{COMFY_OUTPUT_PATH}/{output_images}"
-    print(f"runpod-worker-comfy - Full local path: {local_image_path}")
+    if output_file is None:
+        return {
+            "status": "error",
+            "message": "No output file found in the generation results"
+        }
+
+    # Construct our path and compare with provided full path
+    local_file_path = f"{COMFY_OUTPUT_PATH}/{output_file}"
+    print(f"runpod-worker-comfy - Constructed local path: {local_file_path}")
+    print(f"runpod-worker-comfy - ComfyUI provided path: {full_path}")
+
+    if full_path and os.path.exists(full_path):
+        print(f"runpod-worker-comfy - Using ComfyUI provided path")
+        local_file_path = full_path
+    elif not os.path.exists(local_file_path):
+        print(f"runpod-worker-comfy - Constructed path does not exist, trying ComfyUI path")
+        local_file_path = full_path
 
     # Check if directory exists
-    dir_path = os.path.dirname(local_image_path)
+    dir_path = os.path.dirname(local_file_path)
     print(f"runpod-worker-comfy - Directory path: {dir_path}")
     if os.path.exists(dir_path):
         print(f"runpod-worker-comfy - Directory exists")
@@ -246,24 +268,24 @@ def process_output_files(outputs, job_id):
     else:
         print(f"runpod-worker-comfy - Directory does not exist!")
 
-    if os.path.exists(local_image_path):
-        print(f"runpod-worker-comfy - File exists at: {local_image_path}")
-        print(f"runpod-worker-comfy - File size: {os.path.getsize(local_image_path)} bytes")
+    if os.path.exists(local_file_path):
+        print(f"runpod-worker-comfy - File exists at: {local_file_path}")
+        print(f"runpod-worker-comfy - File size: {os.path.getsize(local_file_path)} bytes")
         print(f"runpod-worker-comfy - Attempting to upload to S3...")
         
-        image = rp_upload.upload_image(job_id, local_image_path)
+        file_url = rp_upload.upload_image(job_id, local_file_path)
         print(f"runpod-worker-comfy - File successfully uploaded to S3")
-        print(f"runpod-worker-comfy - S3 URL: {image}")
+        print(f"runpod-worker-comfy - S3 URL: {file_url}")
         
         return {
             "status": "success",
-            "message": image,
+            "message": file_url,
         }
     else:
-        print(f"runpod-worker-comfy - File does not exist at: {local_image_path}")
+        print(f"runpod-worker-comfy - File does not exist at: {local_file_path}")
         return {
             "status": "error",
-            "message": f"the file does not exist in the specified output folder: {local_image_path}",
+            "message": f"the file does not exist in the specified output folder: {local_file_path}",
         }
 
 
