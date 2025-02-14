@@ -47,12 +47,6 @@ RUN pip install imageio-ffmpeg
 # Support for the network volume
 ADD src/extra_model_paths.yaml ./
 
-WORKDIR /comfyui/custom_nodes/
-
-RUN git clone https://github.com/RZ67P2/ComfyUI-LatentSyncWrapper.git
-
-RUN pip install -r ComfyUI-LatentSyncWrapper/requirements.txt
-
 # Go back to the root
 WORKDIR /
 
