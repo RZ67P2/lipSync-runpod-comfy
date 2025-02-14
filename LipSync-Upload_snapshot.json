@@ -4,10 +4,6 @@
         "https://github.com/ltdrdata/ComfyUI-Manager.git": {
             "hash": "da2b4be539180aafd3150b61c453661186c858d8",
             "disabled": false
-        },
-        "https://github.com/ShmuelRonen/ComfyUI-LatentSyncWrapper.git": {
-            "hash": "8f2a008dcb9996b74c5110c009be063e7565c14f",
-            "disabled": false
         }
     },
     "cnr_custom_nodes": {
