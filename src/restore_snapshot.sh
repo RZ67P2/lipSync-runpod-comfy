@@ -11,6 +11,6 @@ fi
 
 echo "runpod-worker-comfy: restoring snapshot: $SNAPSHOT_FILE"
 
-comfy --workspace /comfyui node restore-snapshot "$SNAPSHOT_FILE" --pip-non-url
+python /comfyui/custom_nodes/ComfyUI-Manager/cm-cli.py restore-snapshot "$SNAPSHOT_FILE"
 
 echo "runpod-worker-comfy: restored snapshot file: $SNAPSHOT_FILE"
